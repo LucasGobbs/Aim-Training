@@ -18,6 +18,9 @@ impl Game{
     pub fn add_target(&mut self, new_target: Target){
         self.targets.push(new_target);
     }
+    pub fn remove_target(&mut self, index: usize){
+        self.targets.remove(index);
+    }
 }
 impl UserData for Game {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
@@ -29,9 +32,14 @@ impl UserData for Game {
             let target = *game.targets.get(index).unwrap();
             Ok((target,))
         });
-        methods.add_method("add", |_, game, (new_t,): (Target,)| {
+        methods.add_method("add_target", |_, game, (new_t,): (Target,)| {
             let mut other_game = game.clone();
             other_game.add_target(new_t);
+            Ok((other_game,))
+        });
+        methods.add_method("remove_target", |_, game, (index,): (usize,)| {
+            let mut other_game = game.clone();
+            other_game.remove_target(index);
             Ok((other_game,))
         });
         methods.add_method("targets", |_, game, ()| {

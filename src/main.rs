@@ -72,7 +72,7 @@ impl State for GameState {
         self.lua.context(|lua_ctx| {
             
             let globals = lua_ctx.globals();
-            let game = globals.get::<_, Game>("game").unwrap(); 
+            let mut game = globals.get::<_, Game>("game").unwrap(); 
 
             let update_f: Function = globals.get("update").unwrap();
             update_f.call::<_, ()>((),).unwrap();
@@ -80,12 +80,13 @@ impl State for GameState {
             let on_mouse_hit_target_f: Function = globals.get("on_mouse_hit_target").unwrap();
             let (mx, my) = (input::get_mouse_x(ctx), input::get_mouse_y(ctx));
             for (index,target) in game.targets.iter().enumerate() {
-                
                 let flag = target.is_inside(mx,my);
                 if flag {
                     on_mouse_hit_target_f.call::<_, ()>((index,),).unwrap();
                 }
             }
+            game = globals.get::<_, Game>("game").unwrap();
+            //globals.set("game", game).unwrap(); 
         });
         Ok(())
     }
